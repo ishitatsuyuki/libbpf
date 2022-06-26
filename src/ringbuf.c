@@ -16,6 +16,7 @@
 #include <asm/barrier.h>
 #include <sys/mman.h>
 #include <sys/epoll.h>
+#include <stdatomic.h>
 
 #include "libbpf.h"
 #include "libbpf_internal.h"
@@ -231,14 +232,14 @@ static int64_t ringbuf_process_ring(struct ring* r)
 				err = r->sample_cb(r->ctx, sample, len);
 				if (err < 0) {
 					/* update consumer pos and bail out */
-					smp_store_release(r->consumer_pos,
+					atomic_store(r->consumer_pos,
 							  cons_pos);
 					return err;
 				}
 				cnt++;
 			}
 
-			smp_store_release(r->consumer_pos, cons_pos);
+			atomic_store(r->consumer_pos, cons_pos);
 		}
 	} while (got_new_data);
 done:
