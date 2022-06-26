@@ -126,7 +126,7 @@ int ring_buffer__add(struct ring_buffer *rb, int map_fd,
 	e = &rb->events[rb->ring_cnt];
 	memset(e, 0, sizeof(*e));
 
-	e->events = EPOLLIN;
+	e->events = EPOLLIN | EPOLLET;
 	e->data.fd = rb->ring_cnt;
 	if (epoll_ctl(rb->epoll_fd, EPOLL_CTL_ADD, map_fd, e) < 0) {
 		err = -errno;
